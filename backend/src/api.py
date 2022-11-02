@@ -70,6 +70,50 @@ def create_app(test_config=None):
             return article_schema.jsonify(article)
         except:
             abort(404)
+            
+    # update a single article
+    @app.route('/articles/<int:article_id>/update', methods=['PUT'])
+    def patch_article(article_id):
+        body = request.get_json()
+        new_title = body.get('title')
+        new_description = body.get('description')
+        
+        try:
+            article = Articles.query.filter(Articles.id == article_id).one_or_none()
+            if article is None:
+                abort(404)
+            article.title = new_title
+            article.description = new_description 
+            article.update()
+            
+            return jsonify({
+                'success': True,
+                'status': 200,
+                'id': article.id
+            })
+        except:
+            abort(422)
+    
+    # delete article
+    @app.route('/articles/<int:article_id>/delete', methods=['DELETE'])
+    def delete_article(article_id):
+        
+        try:
+            article = Articles.query.get(article_id)
+            if article is None:
+                abort(404)
+            article.delete()
+            
+            return jsonify({
+                'success': True,
+                'deleted': article.id,
+                'total_article': len(Articles.query.all())
+            })
+        except:
+            abort(422)
+            
+    
+    # implement list of errorhandler
         
     @app.errorhandler(404)
     def not_found(error):
