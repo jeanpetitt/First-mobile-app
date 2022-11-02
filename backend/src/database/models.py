@@ -54,4 +54,4 @@ class ArticleSerialisation(ma.Schema):
         fields = ('id', 'title', 'description')
         
 article_schema = ArticleSerialisation()
-article_schemas = ArticleSerialisation(many=True)
+articles_schema = ArticleSerialisation(many=True)

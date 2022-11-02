@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
-from database.models import setup_db, Articles, db
+from database.models import setup_db, Articles, db, article_schema, articles_schema
 
 def create_app(test_config=None):
     app = Flask(__name__)
@@ -22,16 +22,18 @@ def create_app(test_config=None):
     def get_article():
         list_articles = Articles.query.all()
         
-        articles = [art.format() for art in list_articles]
+        # articles = [art.format() for art in list_articles]
+        articles = articles_schema.dump(list_articles)
         
-        return jsonify({
-            'succes': True,
-            'articles': articles,
-            'total_article': len(list_articles)
-        })
+        # return jsonify({
+        #     'succes': True,
+        #     'articles': articles,
+        #     'total_article': len(list_articles)
+        # })
+        return jsonify(articles)
     
     # ajouter un nouvelle article  
-    @app.route('/articles', methods=['POST'])
+    @app.route('/articles/add', methods=['POST'])
     def add_new_article():
         body = request.get_json()
         new_title = body.get('title', None)
@@ -41,15 +43,33 @@ def create_app(test_config=None):
             article = Articles(new_title, new_description)
             article.insert()
             articles = [art.format() for art in Articles.query.all()]
+            
+        #     return jsonify({
+        #     'success': True,
+        #     'created_id': article.id,
+        #     'articles': articles,
+        #     'total_article': len(Articles.query.all())
+        # })
+        
+            return article_schema.jsonify(article)
+            
         except:
             abort(422)
         
-        return jsonify({
-            'success': True,
-            'created_id': article.id,
-            'articles': articles,
-            'total_article': len(Articles.query.all())
-        })
+        
+    
+    # get detail of articles
+    @app.route('/articles/<int:article_id>')
+    def get_article_detail(article_id):
+        try:
+            
+            article = Articles.query.get(article_id)
+            if article is None:
+                abort(404)
+                
+            return article_schema.jsonify(article)
+        except:
+            abort(404)
         
         
         
