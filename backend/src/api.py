@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
-from database.models import setup_db, Articles, db, article_schema, articles_schema
+from database.models import setup_db, Articles, article_schema, articles_schema
 
 def create_app(test_config=None):
     app = Flask(__name__)
@@ -25,12 +25,12 @@ def create_app(test_config=None):
         # articles = [art.format() for art in list_articles]
         articles = articles_schema.dump(list_articles)
         
-        # return jsonify({
-        #     'succes': True,
-        #     'articles': articles,
-        #     'total_article': len(list_articles)
-        # })
-        return jsonify(articles)
+        return jsonify({
+            'succes': True,
+            'articles': articles,
+            'total_article': len(list_articles)
+        })
+        # return jsonify(articles)
     
     # ajouter un nouvelle article  
     @app.route('/articles/add', methods=['POST'])
@@ -44,14 +44,14 @@ def create_app(test_config=None):
             article.insert()
             articles = [art.format() for art in Articles.query.all()]
             
-        #     return jsonify({
-        #     'success': True,
-        #     'created_id': article.id,
-        #     'articles': articles,
-        #     'total_article': len(Articles.query.all())
-        # })
+            return jsonify({
+            'success': True,
+            'created_id': article.id,
+            'articles': articles,
+            'total_article': len(Articles.query.all())
+        })
         
-            return article_schema.jsonify(article)
+            # return article_schema.jsonify(article)
             
         except:
             abort(422)
@@ -89,7 +89,7 @@ def create_app(test_config=None):
             return jsonify({
                 'success': True,
                 'status': 200,
-                'id': article.id
+                'updated': article.id
             })
         except:
             abort(422)
